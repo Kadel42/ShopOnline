@@ -42,9 +42,17 @@ public class ShoppingCartRepository : IShoppingCartRepository
         return null;
     }
 
-    public Task<CartItem> DeleteItem(int id)
+    public async Task<CartItem> DeleteItem(int id)
     {
-        throw new NotImplementedException();
+        var item = await _shopOnlineDbContext.CartItems.FindAsync(id);
+
+        if (item != null)
+        {
+            _shopOnlineDbContext.CartItems.Remove(item);
+            await _shopOnlineDbContext.SaveChangesAsync();
+        }
+
+        return null;
     }
 
     public async Task<CartItem> GetItem(int id)
@@ -77,8 +85,15 @@ public class ShoppingCartRepository : IShoppingCartRepository
                       }).ToListAsync();
     }
 
-    public Task<CartItem> UpdateQty(int id, CartItemQtyUpdateDto cartItemQtyUpdateDto)
+    public async Task<CartItem> UpdateQty(int id, CartItemQtyUpdateDto cartItemQtyUpdateDto)
     {
-        throw new NotImplementedException();
+        var item = await _shopOnlineDbContext.CartItems.FindAsync(id);
+        if (item != null)
+        {
+            item.Qty = cartItemQtyUpdateDto.Qty;
+            await _shopOnlineDbContext.SaveChangesAsync();
+            return item;
+        }
+        return null;
     }
 }
