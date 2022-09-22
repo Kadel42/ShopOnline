@@ -27,6 +27,7 @@ public class ShoppingCartBase:ComponentBase
 		{
 			ShoppingCartItems = await ShoppingCartService.GetItems(HardCoded.UserId);
             CalculateCartSummaryTotals();
+			CartChanged();
         }
 		catch (Exception ex)
 		{
@@ -38,7 +39,7 @@ public class ShoppingCartBase:ComponentBase
 	{
 		var cartItemDto = await ShoppingCartService.DeleteItem(id);
 		RemoveCartItem(id);
-        CalculateCartSummaryTotals();
+        CartChanged();
     }
 
 	protected async Task UpdateQtyCartItem_Click(int id, int qty)
@@ -56,7 +57,7 @@ public class ShoppingCartBase:ComponentBase
 				var returnedUpdateItemDto = await ShoppingCartService.UpdateQty(updateItemDto);
 
 				UpdateItemTotalPrice(returnedUpdateItemDto);
-                CalculateCartSummaryTotals();
+                CartChanged();
                 await MakeUpdateQtyButtonVisible( id, false);
             }
 			else
@@ -120,5 +121,11 @@ public class ShoppingCartBase:ComponentBase
 		var cartItemDto = GetCartItem(id);
 
 		ShoppingCartItems.Remove(cartItemDto);
+	}
+
+	void CartChanged()
+	{
+		CalculateCartSummaryTotals();
+		ShoppingCartService.RaiseEventOnShoppingCartChanged(TotalQuantity);
 	}
 }
